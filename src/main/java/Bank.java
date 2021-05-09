@@ -1,6 +1,5 @@
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 public class Bank {
@@ -48,17 +47,17 @@ public class Bank {
         return new LinkedList<>(kontoMap.keySet());
     }
 
-    public boolean geldAbheben(long von, double betrag) throws GesperrtException, IllegalArgumentException, KontonummerNotFoundException {
+    public boolean geldAbheben(long von, double betrag) throws GesperrtException, IllegalArgumentException, KontonummerNichtGefundenException {
         if (!kontoMap.containsKey(von)) {
-            throw new KontonummerNotFoundException(von);
+            throw new KontonummerNichtGefundenException(von);
         }
         kontoMap.get(von).abheben(betrag);
         return true;
     }
 
-    public void geldEinzahlen(long auf, double betrag) throws IllegalArgumentException, KontonummerNotFoundException {
+    public void geldEinzahlen(long auf, double betrag) throws IllegalArgumentException, KontonummerNichtGefundenException {
         if (!kontoMap.containsKey(auf)) {
-            throw new KontonummerNotFoundException(auf);
+            throw new KontonummerNichtGefundenException(auf);
         }
         kontoMap.get(auf).einzahlen(betrag);
     }
@@ -71,9 +70,9 @@ public class Bank {
         return true;
     }
 
-    public double getKontostand(long nummer) throws KontonummerNotFoundException {
+    public double getKontostand(long nummer) throws KontonummerNichtGefundenException {
         if (!kontoMap.containsKey(nummer)) {
-            throw new KontonummerNotFoundException(nummer);
+            throw new KontonummerNichtGefundenException(nummer);
         }
         return kontoMap.get(nummer).getKontostand();
     }
