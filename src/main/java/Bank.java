@@ -63,9 +63,9 @@ public class Bank {
         kontoMap.get(auf).einzahlen(betrag);
     }
 
-    public boolean kontoLoeschen(long nummer) throws KontonummerNotFoundException {
+    public boolean kontoLoeschen(long nummer) {
         if (!kontoMap.containsKey(nummer)) {
-            throw new KontonummerNotFoundException(nummer);
+            return false;
         }
         kontoMap.remove(nummer);
         return true;
@@ -78,13 +78,13 @@ public class Bank {
         return kontoMap.get(nummer).getKontostand();
     }
 
-    public boolean geldUeberweisen(long vonKontonr, long nachKontonr, double betrag, String verwendungszweck) throws KontonummerNotFoundException {
+    public boolean geldUeberweisen(long vonKontonr, long nachKontonr, double betrag, String verwendungszweck) throws GesperrtException {
         if (!kontoMap.containsKey(vonKontonr)) {
             System.err.println("Senderkonto nicht gefunden.");
-            throw new KontonummerNotFoundException(vonKontonr);
+            return false;
         } else if (!kontoMap.containsKey(nachKontonr)) {
             System.err.println("Empfängerkonto nicht gefunden.");
-            throw new KontonummerNotFoundException(nachKontonr);
+            return false;
         }
         Konto senderKonto = kontoMap.get(vonKontonr);
         Konto empfaengerKonto = kontoMap.get(nachKontonr);
@@ -96,19 +96,14 @@ public class Bank {
         Ueberweisungsfaehig sender = (Ueberweisungsfaehig) senderKonto;
         Ueberweisungsfaehig empfaenger = (Ueberweisungsfaehig) empfaengerKonto;
 
-        try {
-            sender.ueberweisungAbsenden(betrag,
-                    empfaengerKonto.getKontonummerFormatiert(),
-                    nachKontonr, getBANKLEITZAHL(), verwendungszweck);
-        } catch (GesperrtException e) {
-            System.err.println("Senderkonto ist gesperrt. Ueberweisung kann nicht durchgeführt werden.");
-            e.printStackTrace();
+        if (!sender.ueberweisungAbsenden(betrag,
+                empfaengerKonto.getInhaber().getName(),
+                nachKontonr, getBANKLEITZAHL(), verwendungszweck)) {
             return false;
-        } finally {
-            empfaenger.ueberweisungEmpfangen(betrag,
-                    senderKonto.getKontonummerFormatiert(),
-                    vonKontonr, getBANKLEITZAHL(), verwendungszweck);
         }
+        empfaenger.ueberweisungEmpfangen(betrag,
+                senderKonto.getInhaber().getName(),
+                vonKontonr, getBANKLEITZAHL(), verwendungszweck);
         return true;
     }
 
