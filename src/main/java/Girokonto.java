@@ -102,6 +102,7 @@ public class Girokonto extends Konto implements Ueberweisungsfaehig {
 
     /**
      * ändert Dispo und Kontostand in neue Währung
+     *
      * @param neu neue Währung in die gewechselt wird
      */
     @Override

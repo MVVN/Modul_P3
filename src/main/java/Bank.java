@@ -5,21 +5,21 @@ import java.util.TreeMap;
 
 public class Bank {
 
-    private final long bankleitzahl;
-    private Map<Long, Konto> kontoMap;
+    private final long BANKLEITZAHL;
+    private TreeMap<Long, Konto> kontoMap;
     private long nextKontoNummer;
 
     public Bank(long bankleitzahl) {
         if (bankleitzahl < 0) {
             throw new IllegalArgumentException("Bankleitzahl kann nicht negativ sein.");
         }
-        this.bankleitzahl = bankleitzahl;
+        this.BANKLEITZAHL = bankleitzahl;
         this.kontoMap = new TreeMap<Long, Konto>();
         this.nextKontoNummer = 1;
     }
 
-    public long getBankleitzahl() {
-        return bankleitzahl;
+    public long getBANKLEITZAHL() {
+        return BANKLEITZAHL;
     }
 
     public long girokontoErstellen(Kunde inhaber) {
@@ -37,28 +37,77 @@ public class Bank {
     }
 
     public String getAlleKonten() {
-        String alleKonten = "";
+        StringBuilder sb = new StringBuilder();
         for (Konto k : kontoMap.values()) {
-            alleKonten += k.getKontonummerFormatiert() + " " + k.getKontostandFormatiert() + System.lineSeparator();
+            sb.append(k.getKontonummerFormatiert() + ", " + k.getKontostandFormatiert() + " ; " + System.lineSeparator());
         }
-        return alleKonten;
+        return sb.toString();
     }
 
     public List<Long> getAlleKontonummern() {
         return new LinkedList<>(kontoMap.keySet());
     }
 
-    public boolean geldAbheben(long von, double betrag) {
-        if (kontoMap.get(von) == null) {
-            System.err.println("Konto unter dieser Nummer nicht gefunden.");
+    public boolean geldAbheben(long von, double betrag) throws GesperrtException, IllegalArgumentException, KontonummerNotFoundException {
+        if (!kontoMap.containsKey(von)) {
+            throw new KontonummerNotFoundException(von);
+        }
+        kontoMap.get(von).abheben(betrag);
+        return true;
+    }
+
+    public void geldEinzahlen(long auf, double betrag) throws IllegalArgumentException, KontonummerNotFoundException {
+        if (!kontoMap.containsKey(auf)) {
+            throw new KontonummerNotFoundException(auf);
+        }
+        kontoMap.get(auf).einzahlen(betrag);
+    }
+
+    public boolean kontoLoeschen(long nummer) throws KontonummerNotFoundException {
+        if (!kontoMap.containsKey(nummer)) {
+            throw new KontonummerNotFoundException(nummer);
+        }
+        kontoMap.remove(nummer);
+        return true;
+    }
+
+    public double getKontostand(long nummer) throws KontonummerNotFoundException {
+        if (!kontoMap.containsKey(nummer)) {
+            throw new KontonummerNotFoundException(nummer);
+        }
+        return kontoMap.get(nummer).getKontostand();
+    }
+
+    public boolean geldUeberweisen(long vonKontonr, long nachKontonr, double betrag, String verwendungszweck) throws KontonummerNotFoundException {
+        if (!kontoMap.containsKey(vonKontonr)) {
+            System.err.println("Senderkonto nicht gefunden.");
+            throw new KontonummerNotFoundException(vonKontonr);
+        } else if (!kontoMap.containsKey(nachKontonr)) {
+            System.err.println("Empfängerkonto nicht gefunden.");
+            throw new KontonummerNotFoundException(nachKontonr);
+        }
+        Konto senderKonto = kontoMap.get(vonKontonr);
+        Konto empfaengerKonto = kontoMap.get(nachKontonr);
+
+        if (!Ueberweisungsfaehig.class.isAssignableFrom(senderKonto.getClass()) || !Ueberweisungsfaehig.class.isAssignableFrom(empfaengerKonto.getClass())) {
+            System.err.println("Beide Konten müssen Überweisungsfähig sein.");
             return false;
         }
+        Ueberweisungsfaehig sender = (Ueberweisungsfaehig) senderKonto;
+        Ueberweisungsfaehig empfaenger = (Ueberweisungsfaehig) empfaengerKonto;
+
         try {
-            kontoMap.get(von).abheben(betrag);
+            sender.ueberweisungAbsenden(betrag,
+                    empfaengerKonto.getKontonummerFormatiert(),
+                    nachKontonr, getBANKLEITZAHL(), verwendungszweck);
         } catch (GesperrtException e) {
-            System.err.println("Konto gesperrt.");
+            System.err.println("Senderkonto ist gesperrt. Ueberweisung kann nicht durchgeführt werden.");
             e.printStackTrace();
             return false;
+        } finally {
+            empfaenger.ueberweisungEmpfangen(betrag,
+                    senderKonto.getKontonummerFormatiert(),
+                    vonKontonr, getBANKLEITZAHL(), verwendungszweck);
         }
         return true;
     }
