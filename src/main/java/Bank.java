@@ -186,4 +186,10 @@ public class Bank {
         return true;
     }
 
+    public long mockEinfuegen(Konto k) {
+        kontoMap.put(nextKontoNummer, k);
+        nextKontoNummer++;
+        return k.getKontonummer();
+    }
+
 }
