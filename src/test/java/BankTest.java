@@ -72,7 +72,7 @@ class BankTest {
      * Testen, ob Konstruktor die Bank richtig anlegt
      */
     @Test
-    public void newCreatedBankHasNoAccounts() {
+    public void newCreatedBank_HasNoAccounts() {
         Assertions.assertEquals("", bank.getAlleKonten());
         Assertions.assertTrue(bank.getAlleKontonummern().isEmpty());
         Assertions.assertEquals(12345, bank.getBankleitzahl());
@@ -82,7 +82,7 @@ class BankTest {
      * Bank mit 2 Konten; 1. gelöscht und nicht mehr zugreifbar und nicht mehr in Liste
      */
     @Test
-    public void bankLoeschtKontoErfolgreich() {
+    public void bankLoeschtKonto_Erfolgreich() {
         giroNummer = bank.mockEinfuegen(girokonto);
         sparNummer = bank.mockEinfuegen(sparbuch);
         Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
@@ -99,7 +99,7 @@ class BankTest {
     }
 
     @Test
-    public void bankGetAlleKontenFunktioniert() {
+    public void bankGetAlleKonten_Funktioniert() {
         giroNummer = bank.mockEinfuegen(girokonto);
         Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
         Assertions.assertEquals("Girokonto - Kontonummer formatiert: 0, Girokonto - Kontostand formatiert: 1000,00 Euro ; " + System.lineSeparator(),
@@ -115,7 +115,7 @@ class BankTest {
      * simuliert Erstellen und Nutzen von Girokonto mittels mockEinfuegen
      */
     @Test
-    public void bankGirokontoZugreifbar() {
+    public void bankGirokonto_Zugreifbar() {
         giroNummer = bank.mockEinfuegen(girokonto);
         Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
         Assertions.assertEquals(1, bank.getAlleKontonummern().size());
@@ -140,7 +140,7 @@ class BankTest {
      * Testet Zugriff auf Sparbuch in Bank
      */
     @Test
-    public void bankSparbuchZugreifbar() {
+    public void bankSparbuch_Zugreifbar() {
         sparNummer = bank.mockEinfuegen(sparbuch);
         Mockito.when(sparbuch.getKontonummer()).thenReturn(sparNummer);
         Assertions.assertEquals(1, bank.getAlleKontonummern().size());
@@ -165,7 +165,7 @@ class BankTest {
      * testes Überweisung zwischen zwei Girokonten
      */
     @Test
-    public void bankÜberweisungGiroToGiro() {
+    public void bankUeberweisung_GiroToGiro() {
         giroNummer = bank.mockEinfuegen(girokonto);
         giroNummer2 = bank.mockEinfuegen(girokonto2);
         Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
@@ -204,7 +204,7 @@ class BankTest {
      * Überweisung returned false, wenn Sender nicht genug Geld hat
      */
     @Test
-    public void bankÜberweisungSenderNichtGenugCash() {
+    public void bankUeberweisung_SenderNichtGenugCash() {
         giroNummer = bank.mockEinfuegen(girokonto);
         giroNummer2 = bank.mockEinfuegen(girokonto2);
         Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
@@ -226,22 +226,24 @@ class BankTest {
         } catch (GesperrtException e) {
             Assertions.fail("Fehler.");
         }
-        Mockito.verify(girokonto, Mockito.times(2)).getKontonummer();
-//        Ich bekomme hier die Fehlermeldung: Wanted but not invoked
-//        Sollte ueberweisungAbsenden nicht aber aufgerufen werden, damit sie überhaupt erst false zurückgeben kann?
-//            Mockito.verify(girokonto).ueberweisungAbsenden(
-//                    99, girokonto2.getInhaber().getName(),
-//                    giroNummer2, bank.getBankleitzahl(), "Überweisungstest"
-//            );
-        Mockito.verify(girokonto2, Mockito.times(2)).getKontonummer();
-        Mockito.verifyNoMoreInteractions(girokonto, girokonto2);
+        Mockito.verify(girokonto).getKontonummer();
+
+        try {
+            Mockito.verify(girokonto).ueberweisungAbsenden(
+                    99, girokonto2.getInhaber().getName(),
+                    giroNummer2, bank.getBankleitzahl(), "Überweisungstest"
+            );
+        } catch (GesperrtException e) {
+            Assertions.fail("Fehler.");
+        }
+        Mockito.verifyNoMoreInteractions(girokonto);
     }
 
     /**
      * Überweisung mit Sparbuch sollte false zurückgeben
      */
     @Test
-    public void bankÜberweisungGiroToSparbuchReturnFalse() {
+    public void bankUeberweisung_GiroToSparbuch_ReturnFalse() {
         giroNummer = bank.mockEinfuegen(girokonto);
         sparNummer = bank.mockEinfuegen(sparbuch);
         Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
@@ -258,8 +260,8 @@ class BankTest {
         } catch (GesperrtException e) {
             Assertions.fail("Fehler.");
         }
-        Mockito.verify(girokonto, Mockito.times(2)).getKontonummer();
-        Mockito.verify(sparbuch, Mockito.times(2)).getKontonummer();
+        Mockito.verify(girokonto).getKontonummer();
+        Mockito.verify(sparbuch).getKontonummer();
         Mockito.verifyNoMoreInteractions(girokonto, sparbuch);
     }
 
@@ -267,7 +269,7 @@ class BankTest {
      * Überweisung zu nicht vorhandenem Konto returns false
      */
     @Test
-    public void bankÜberweisungGiroToEmpty() {
+    public void bankUeberweisung_GiroToEmpty() {
         giroNummer = bank.mockEinfuegen(girokonto);
         Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
         Assertions.assertEquals(1, bank.getAlleKontonummern().size());
@@ -278,9 +280,76 @@ class BankTest {
         } catch (GesperrtException e) {
             Assertions.fail("Fehler.");
         }
-        Mockito.verify(girokonto).getKontonummer();
-        Mockito.verifyNoMoreInteractions(girokonto);
+        Mockito.verifyNoInteractions(girokonto);
     }
 
+    /**
+     * Überweisung mit GesperrtException
+     */
+    @Test
+    public void bankUeberweisung_KontoGesperrtException() {
+        giroNummer = bank.mockEinfuegen(girokonto);
+        giroNummer2 = bank.mockEinfuegen(girokonto2);
+        Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
+        Mockito.when(girokonto2.getKontonummer()).thenReturn(giroNummer2);
+        try {
+            Mockito.doThrow(new GesperrtException(girokonto.getKontonummer())).when(girokonto).ueberweisungAbsenden(ArgumentMatchers.anyDouble(), ArgumentMatchers.anyString(),
+                    ArgumentMatchers.anyLong(), ArgumentMatchers.anyLong(), ArgumentMatchers.anyString());
+        } catch (GesperrtException e) {
+            Assertions.fail("Fehler.");
+        }
+        try {
+            bank.geldUeberweisen(giroNummer, giroNummer2, 99, "Gesperrt");
+            Assertions.fail("Exception sollte geworfen werden!");
+        } catch (GesperrtException e) {
+        }
+        Mockito.verify(girokonto2).getInhaber();
+        Mockito.verifyNoMoreInteractions(girokonto2);
+    }
+
+    /**
+     * Einzahlen ungültiger Betrag funktioniert nicht - wirft IllegalArgumentException
+     */
+    @Test
+    public void bankEinzahlen_IllegalArgumentException() {
+        giroNummer = bank.mockEinfuegen(girokonto);
+        Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
+        try {
+            Mockito.doThrow(new IllegalArgumentException()).when(girokonto).einzahlen(ArgumentMatchers.anyDouble());
+            bank.geldEinzahlen(giroNummer, 99);
+            Assertions.fail("Exception sollte geworfen werden!");
+        } catch (IllegalArgumentException | KontonummerNichtGefundenException e) {
+        }
+    }
+
+    /**
+     * Abheben ungültiger Betrag funktioniert nicht - wirft IllegalArgumentException
+     */
+    @Test
+    public void bankAbheben_IllegalArgumentException() {
+        giroNummer = bank.mockEinfuegen(girokonto);
+        Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
+        try {
+            Mockito.doThrow(new IllegalArgumentException()).when(girokonto).abheben(ArgumentMatchers.anyDouble());
+            bank.geldAbheben(giroNummer, 99);
+            Assertions.fail("Exception sollte geworfen werden!");
+        } catch (IllegalArgumentException | KontonummerNichtGefundenException | GesperrtException e) {
+        }
+    }
+
+    /**
+     * Abheben von gesperrtem Konto funktioniert nicht - wirft GesperrtException
+     */
+    @Test
+    public void bankAbheben_GesperrtException() {
+        giroNummer = bank.mockEinfuegen(girokonto);
+        Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
+        try {
+            Mockito.doThrow(new GesperrtException(giroNummer)).when(girokonto).abheben(ArgumentMatchers.anyDouble());
+            bank.geldAbheben(giroNummer, 99);
+            Assertions.fail("Exception sollte geworfen werden!");
+        } catch (IllegalArgumentException | KontonummerNichtGefundenException | GesperrtException e) {
+        }
+    }
 
 }

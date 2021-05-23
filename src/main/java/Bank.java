@@ -189,7 +189,7 @@ public class Bank {
     public long mockEinfuegen(Konto k) {
         kontoMap.put(nextKontoNummer, k);
         nextKontoNummer++;
-        return k.getKontonummer();
+        return nextKontoNummer-1;
     }
 
 }
