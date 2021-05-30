@@ -1,16 +1,19 @@
 package vorlesung7.buchhandlung;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+
 /**
- * K�ufer in der Ein-Buch-Buchhandlung. Er holt mehrmals ein Buch aus dem Regal
+ * K�ufer in der Ein-Buch-Buchhandlung. Er holt 100 mal ein Buch aus dem Regal
  *
  */
-public class Kaeufer implements Runnable
+public class Kaeufer
 {
 	/**
 	 * die Buchhandlung
 	 */
 	Buchhandlung handlung;
-	
+
 	/**
 	 * erstellt einen K�ufer, der in der angegebenen Buchhandlung "einkauft"
 	 * @param handlung
@@ -19,62 +22,34 @@ public class Kaeufer implements Runnable
 	{
 		this.handlung = handlung;
 	}
-	
+
 	/**
 	 * Der K�ufer nimmt nacheinander viele B�cher aus dem Regal
 	 */
-	public void kaufen(int insgesamt)
+	public void kaufen(int nr, Lock l, Condition regalLeer)
 	{
 		int i = 0;
-		while (i < insgesamt && !handlung.geschlossen)
+		while (i < 500 && !handlung.geschlossen)
 		{
-			int anzahl;
-			synchronized(handlung)
+			while(handlung.getAnzahlBuecher().get() == 0)
 			{
-				
-				anzahl = handlung.getAnzahlBuecher();
-				//Aktives Warten: NIEMALS!!!
-/*				while(anzahl <= 0)
-				{
-					
-				}
-*/
-				while(anzahl <= 0)
-				{
+				try{
+					l.lock();
 					try {
-						handlung.wait();
+						regalLeer.await();
 					} catch (InterruptedException e) {
-					} //warten, bis es eine �nderung
-									//im Objekt handlung gegeben hat
-									//dersynchronized-Lock wird aufgehoben
-					anzahl = handlung.getAnzahlBuecher();
-							//noch mal den jetzt aktuellen Wert holen
+						System.out.println("bla");
+						return;
+					}
+				} finally {
+					l.unlock();
 				}
-				try {
-					Thread.sleep(4);
-				} catch (InterruptedException e) {
-				}
-				anzahl = anzahl - 1;
-				handlung.setAnzahlBuecher(anzahl);
 			}
-			System.out.println("Kaeufer: "+anzahl);
+			handlung.getAnzahlBuecher().decrementAndGet();
+			Thread.yield();
+			System.out.println("Kaeufer "+ nr + ": "+handlung.getAnzahlBuecher());
 			i++;
 		}
 		System.out.println("K�ufer verl�sst den Laden");
-	}
-	
-	private int insgesamt;
-
-	/**
-	 * @param insgesamt the insgesamt to set
-	 */
-	public void setInsgesamt(int insgesamt) {
-		this.insgesamt = insgesamt;
-	}
-
-	@Override
-	public void run() {
-		this.kaufen(insgesamt);
-		
 	}
 }

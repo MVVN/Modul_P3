@@ -5,6 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.SimpleTimeZone;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -21,7 +25,7 @@ public class BallFrame extends JFrame {
 	private Ballspiel spiel;
 	
 	/**
-	 * erstellt eine Oberfläche mit 4 Buttons
+	 * erstellt eine Oberfläche mit 4 Buttons und Uhrzeit - Textfeld
 	 */
 	public BallFrame() {
 		setSize(400, 200);
@@ -36,6 +40,7 @@ public class BallFrame extends JFrame {
 		Container contentPane = getContentPane();
 		uhrzeit = new JTextField();
 		contentPane.add(uhrzeit, BorderLayout.NORTH);
+		writeTime(uhrzeit);
 		canvas = new JPanel();
 		contentPane.add(canvas, BorderLayout.CENTER);
 		JPanel p = new JPanel();
@@ -78,6 +83,19 @@ public class BallFrame extends JFrame {
 	public JPanel getZeichenflaeche()
 	{
 		return this.canvas;
+	}
+
+	private void writeTime(JTextField clockField) {
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					clockField.setText(dtf.format(LocalDateTime.now()));
+				}
+			}
+		});
+		t.start();
 	}
 
 	private JPanel canvas;
