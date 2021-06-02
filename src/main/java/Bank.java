@@ -1,7 +1,11 @@
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 /**
  * Bank ist eine Klasse, welche in einer Map verschiedene Konten erstellen kann und in einer Map hält
@@ -198,6 +202,7 @@ public class Bank {
 
     /**
      * sammelt alle Kunden, die mindestens bestimmten Kontostand haben
+     *
      * @param minimum der Kontostand, den die Kunden mindestens haben muessen
      * @return Liste aller Kunden mit Kontostand > minimum
      */
@@ -211,23 +216,39 @@ public class Bank {
     /**
      * Ermittelt Namen + Geburtstag aller Kunden der Bank
      * doppelte Namen werden aussortiert und die Liste wird nach Geburtsdaten sortiert
+     *
      * @return String von Kunden + Geburtsdaten gefiltert + sortiert
      */
     public String getKundengeburtstage() {
-
+        return kontoMap.values().stream()
+                .map(Konto::getInhaber)
+                .distinct()
+                .sorted(Comparator.comparing(Kunde::getGeburtstag))
+                .map(kunde -> new StringBuffer(kunde.getName())
+                        .append(" ")
+                        .append(kunde.getGeburtstag()))
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 
     public List<Long> getKontonummernLuecken() {
-
+        return LongStream.range(1L, Long.MAX_VALUE)
+                .filter(x -> !kontoMap.keySet().contains(x))
+                .boxed() // verwandelt long zu Long-Objekten, damit in Liste speicherbar
+                .collect(Collectors.toList());
     }
 
-    public List<Kunde> getAlleReichenKunden(double minimum) {
-
-    }
+//    /**
+//     * Sucht alle Kunden, von denen alle Kontenbetraege ueber einem Minimum sind
+//     * @param minimum das Minimum, welches ueberschritten werden muss
+//     * @return Liste von reichen Kunden
+//     */
+//    public List<Kunde> getAlleReichenKunden(double minimum) {
+//
+//    }
 
     public long mockEinfuegen(Konto k) {
         kontoMap.put(nextKontoNummer, k);
         nextKontoNummer++;
-        return nextKontoNummer-1;
+        return nextKontoNummer - 1;
     }
 }

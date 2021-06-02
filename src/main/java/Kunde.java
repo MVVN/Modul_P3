@@ -213,4 +213,8 @@ public class Kunde implements Comparable<Kunde>{
         else
             ANREDE = "Dear Customer!";
     }
+
+    public boolean equals(Kunde k) {
+        return (this.getName() == k.getName());
+    }
 }
