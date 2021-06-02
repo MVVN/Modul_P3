@@ -1,6 +1,7 @@
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * Bank ist eine Klasse, welche in einer Map verschiedene Konten erstellen kann und in einer Map hält
@@ -186,10 +187,47 @@ public class Bank {
         return true;
     }
 
+    /**
+     * sperrt alle Konten mit negativen Kontostand
+     */
+    public void pleitegeierSperren() {
+        kontoMap.values().stream()
+                .filter(konto -> konto.getKontostand() < 0)
+                .forEach(Konto::sperren);
+    }
+
+    /**
+     * sammelt alle Kunden, die mindestens bestimmten Kontostand haben
+     * @param minimum der Kontostand, den die Kunden mindestens haben muessen
+     * @return Liste aller Kunden mit Kontostand > minimum
+     */
+    public List<Kunde> getKundenMitVollemKonto(double minimum) {
+        return kontoMap.values().stream()
+                .filter(konto -> konto.getKontostand() >= minimum)
+                .map(Konto::getInhaber)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Ermittelt Namen + Geburtstag aller Kunden der Bank
+     * doppelte Namen werden aussortiert und die Liste wird nach Geburtsdaten sortiert
+     * @return String von Kunden + Geburtsdaten gefiltert + sortiert
+     */
+    public String getKundengeburtstage() {
+
+    }
+
+    public List<Long> getKontonummernLuecken() {
+
+    }
+
+    public List<Kunde> getAlleReichenKunden(double minimum) {
+
+    }
+
     public long mockEinfuegen(Konto k) {
         kontoMap.put(nextKontoNummer, k);
         nextKontoNummer++;
         return nextKontoNummer-1;
     }
-
 }
