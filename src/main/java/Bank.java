@@ -25,6 +25,8 @@ public class Bank {
      * bei Erstellung von Konten wird diesem die nextKontoNummer als Kontonummer zugewiesen
      */
     private long nextKontoNummer;
+    private long MIN_KONTONUMMER = 1;
+    private long MAX_KONTONUMMER = Long.MAX_VALUE;
 
     /**
      * Erstellt Bank mit bestimmter Bankleitzahl
@@ -37,7 +39,7 @@ public class Bank {
         }
         this.bankleitzahl = bankleitzahl;
         this.kontoMap = new TreeMap<Long, Konto>();
-        this.nextKontoNummer = 1;
+        this.nextKontoNummer = MIN_KONTONUMMER;
     }
 
     /**
@@ -230,9 +232,14 @@ public class Bank {
                 .collect(Collectors.joining(System.lineSeparator()));
     }
 
+    /**
+     * gibt die unbesetzten Kontunmmern als Liste zurück
+     * kontrolliert dabei zwischen Minimum und Maximum der Kontonummern
+     * @return Liste der unbesetzten Kontonummern in der Bank
+     */
     public List<Long> getKontonummernLuecken() {
-        return LongStream.range(1L, Long.MAX_VALUE)
-                .filter(x -> !kontoMap.keySet().contains(x))
+        return LongStream.range(MIN_KONTONUMMER, MAX_KONTONUMMER)
+                .filter(x -> !kontoMap.containsKey(x))
                 .boxed() // verwandelt long zu Long-Objekten, damit in Liste speicherbar
                 .collect(Collectors.toList());
     }
