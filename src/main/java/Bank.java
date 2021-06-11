@@ -3,15 +3,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 /**
  * Bank ist eine Klasse, welche in einer Map verschiedene Konten erstellen kann und in einer Map hält
  * Sie ermöglicht Einzahlungen und Auszahlungen und Überweisungen
  */
-public class Bank {
+public class Bank implements Cloneable{
 
     /**
      * Bankleitzahl der Bank
@@ -252,6 +250,15 @@ public class Bank {
 //    public List<Kunde> getAlleReichenKunden(double minimum) {
 //
 //    }
+
+    /**
+     * gibt eine eigenständige Kopie der Bank zurück
+     * Zuustand der zu klonenden Bank wird bis zum Zeitpunkt des Klonens übernommen
+     * @return Kopie der Bank
+     */
+/*    public Bank clone() {
+
+    }*/
 
     public long mockEinfuegen(Konto k) {
         kontoMap.put(nextKontoNummer, k);
