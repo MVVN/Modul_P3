@@ -1,4 +1,3 @@
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 
 /**
@@ -293,9 +292,4 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
         ausgabe += this.getGesperrtText() + System.getProperty("line.separator");
         return ausgabe;
     }
-
-    protected void writeObject(ByteArrayOutputStream bos) {
-        // TODO: muss auch überschrieben werden in Unterklassen !
-    }
-
 }

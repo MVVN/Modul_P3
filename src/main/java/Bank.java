@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,8 +10,11 @@ import java.util.stream.LongStream;
  * Bank ist eine Klasse, welche in einer Map verschiedene Konten erstellen kann und in einer Map hält
  * Sie ermöglicht Einzahlungen und Auszahlungen und Überweisungen
  */
-public class Bank implements Cloneable{
-
+public class Bank implements Cloneable, Serializable {
+    /**
+     * Versionsnummer für Serialisierung
+     */
+    private static final long serialVersionUID = 1;
     /**
      * Bankleitzahl der Bank
      */
@@ -256,9 +260,25 @@ public class Bank implements Cloneable{
      * Zuustand der zu klonenden Bank wird bis zum Zeitpunkt des Klonens übernommen
      * @return Kopie der Bank
      */
-/*    public Bank clone() {
-
-    }*/
+    public Bank clone() {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        byte[] byteArray = null;
+        try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(this);
+            oos.flush(); // needed to force content into target-Stream
+            byteArray = bos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Bank copiedBank = null;
+        ByteArrayInputStream bis = new ByteArrayInputStream(byteArray);
+        try (ObjectInputStream ois = new ObjectInputStream(bis)) {
+            copiedBank = (Bank) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return copiedBank;
+    }
 
     public long mockEinfuegen(Konto k) {
         kontoMap.put(nextKontoNummer, k);
