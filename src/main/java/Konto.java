@@ -146,8 +146,27 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * @throws GesperrtException        wenn das Konto gesperrt ist
      * @throws IllegalArgumentException wenn der betrag negativ ist
      */
-    public abstract boolean abheben(double betrag)
-            throws GesperrtException;
+    public boolean abheben(double betrag)
+            throws GesperrtException {
+        if (betrag < 0 || Double.isNaN(betrag)) {
+            throw new IllegalArgumentException("Betrag ungültig");
+        }
+        if (this.isGesperrt()) {
+            throw new GesperrtException(this.getKontonummer());
+        }
+        if(!checkAbhebungPossible(betrag)) {
+            return false;
+        }
+        setKontostand(getKontostand() - betrag);
+        return true;
+    }
+
+    /**
+     * kontrolliert Konto, ob Abheben möglich ist
+     * @param betrag der abzuhebende Betrag
+     * @return true - abheben möglich ; false - nicht möglich
+     */
+    protected abstract boolean checkAbhebungPossible(double betrag);
 
     /**
      * sperrt das Konto, Aktionen zum Schaden des Benutzers sind nicht mehr m�glich.

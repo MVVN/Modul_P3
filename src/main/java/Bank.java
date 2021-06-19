@@ -52,32 +52,46 @@ public class Bank implements Cloneable, Serializable {
     }
 
     /**
-     * Erstellt ein Girokonto und fügt es zu kontoMap hinzu
-     * nextKontoNummer wird um 1 erhöht, somit hat jedes weitere Konto eine eindeutige Nummer
      *
-     * @param inhaber Kunde, für der das Girokonto angelegt wird
-     * @return neue Kontonummer des angelegten Kontos
+     * @param fabrik
+     * @param inhaber
+     * @return
      */
-    public long girokontoErstellen(Kunde inhaber) {
-        Girokonto gk = new Girokonto(inhaber, nextKontoNummer, 200);
-        kontoMap.put(gk.getKontonummer(), gk);
+    public long kontoErstellen(KontoFabrik fabrik, Kunde inhaber) {
+        Konto konto = fabrik.kontoErstellen(inhaber, nextKontoNummer);
+        kontoMap.put(konto.getKontonummer(), konto);
         nextKontoNummer++;
-        return gk.getKontonummer();
+        return konto.getKontonummer();
     }
 
-    /**
-     * Erstellt ein Sparbuch und fügt es zu kontoMap hinzu
-     * nextKontoNummer wird um 1 erhöht, somit hat jedes weitere Konto eine eindeutige Nummer
-     *
-     * @param inhaber Kunde, für der das Sparbuch angelegt wird
-     * @return neue Kontonummer des angelegten Kontos
-     */
-    public long sparbuchErstellen(Kunde inhaber) {
-        Sparbuch sb = new Sparbuch(inhaber, nextKontoNummer);
-        kontoMap.put(sb.getKontonummer(), sb);
-        nextKontoNummer++;
-        return sb.getKontonummer();
-    }
+//
+//    /**
+//     * Erstellt ein Girokonto und fügt es zu kontoMap hinzu
+//     * nextKontoNummer wird um 1 erhöht, somit hat jedes weitere Konto eine eindeutige Nummer
+//     *
+//     * @param inhaber Kunde, für der das Girokonto angelegt wird
+//     * @return neue Kontonummer des angelegten Kontos
+//     */
+//    public long girokontoErstellen(Kunde inhaber) {
+//        Girokonto gk = new Girokonto(inhaber, nextKontoNummer, 200);
+//        kontoMap.put(gk.getKontonummer(), gk);
+//        nextKontoNummer++;
+//        return gk.getKontonummer();
+//    }
+//
+//    /**
+//     * Erstellt ein Sparbuch und fügt es zu kontoMap hinzu
+//     * nextKontoNummer wird um 1 erhöht, somit hat jedes weitere Konto eine eindeutige Nummer
+//     *
+//     * @param inhaber Kunde, für der das Sparbuch angelegt wird
+//     * @return neue Kontonummer des angelegten Kontos
+//     */
+//    public long sparbuchErstellen(Kunde inhaber) {
+//        Sparbuch sb = new Sparbuch(inhaber, nextKontoNummer);
+//        kontoMap.put(sb.getKontonummer(), sb);
+//        nextKontoNummer++;
+//        return sb.getKontonummer();
+//    }
 
     /**
      * Erstellt einen String mit Kontonummer und deren Kontostand von allen in der Bank vorhanden Konten
@@ -280,9 +294,9 @@ public class Bank implements Cloneable, Serializable {
         return copiedBank;
     }
 
-    public long mockEinfuegen(Konto k) {
+ /*   public long mockEinfuegen(Konto k) {
         kontoMap.put(nextKontoNummer, k);
         nextKontoNummer++;
         return nextKontoNummer - 1;
-    }
+    }*/
 }

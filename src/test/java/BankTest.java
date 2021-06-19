@@ -83,8 +83,9 @@ class BankTest {
      */
     @Test
     public void bankLoeschtKonto_Erfolgreich() {
-        giroNummer = bank.mockEinfuegen(girokonto);
-        sparNummer = bank.mockEinfuegen(sparbuch);
+//        giroNummer = bank.mockEinfuegen(girokonto);
+//        sparNummer = bank.mockEinfuegen(sparbuch);
+
         Mockito.when(girokonto.getKontonummer()).thenReturn(giroNummer);
         Mockito.when(sparbuch.getKontonummer()).thenReturn(sparNummer);
 

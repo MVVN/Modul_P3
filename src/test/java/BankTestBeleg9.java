@@ -18,9 +18,9 @@ class BankTestBeleg9 {
         kunde = new Kunde("Mumen", "Raidaa", "Z-City", LocalDate.parse("1993-10-10"));
         kunde2 = new Kunde("Über", "Weisung", "Geldstr. 2", LocalDate.parse("1911-11-11"));
 
-        giroKunde1 = bank.girokontoErstellen(kunde);
-        sparKunde1 = bank.sparbuchErstellen(kunde);
-        giroKunde2 = bank.girokontoErstellen(kunde2);
+//        giroKunde1 = bank.girokontoErstellen(kunde);
+//        sparKunde1 = bank.sparbuchErstellen(kunde);
+//        giroKunde2 = bank.girokontoErstellen(kunde2);
     }
 
     @Test
@@ -33,7 +33,7 @@ class BankTestBeleg9 {
     @Test
     public void copied_bank_is_independent() throws KontonummerNichtGefundenException {
         copiedBank = bank.clone();
-        sparKunde2 = bank.sparbuchErstellen(kunde2);
+//        sparKunde2 = bank.sparbuchErstellen(kunde2);
         bank.geldEinzahlen(giroKunde1, 5);
         Assertions.assertEquals(5, bank.getKontostand(giroKunde1));
         Assertions.assertEquals(0, copiedBank.getKontostand(giroKunde1));
