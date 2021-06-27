@@ -1,4 +1,8 @@
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * stellt ein allgemeines Konto dar
@@ -8,6 +12,11 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * der Kontoinhaber
      */
     private Kunde inhaber;
+
+    /**
+     * PropertyChangeSupport, welcher Beobachter speichert und benachrichtigt
+     */
+    protected transient PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     /**
      * die Kontonummer
@@ -31,7 +40,9 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * @param kontostand neuer Kontostand
      */
     protected void setKontostand(double kontostand) {
+        double old = this.kontostand;
         this.kontostand = kontostand;
+        support.firePropertyChange("Kontostand", old, kontostand);
     }
 
     /**
@@ -85,8 +96,9 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
             throw new IllegalArgumentException("Der Inhaber darf nicht null sein!");
         if (this.gesperrt)
             throw new GesperrtException(this.nummer);
+        Kunde old = this.inhaber;
         this.inhaber = kinh;
-
+        support.firePropertyChange("Inhaber", old, kinh);
     }
 
     /**
@@ -172,14 +184,18 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
      * sperrt das Konto, Aktionen zum Schaden des Benutzers sind nicht mehr m�glich.
      */
     public final void sperren() {
+        boolean old = this.gesperrt;
         this.gesperrt = true;
+        support.firePropertyChange("Gesperrt", old, !old);
     }
 
     /**
      * entsperrt das Konto, alle Kontoaktionen sind wieder m�glich.
      */
     public final void entsperren() {
+        boolean old = this.gesperrt;
         this.gesperrt = false;
+        support.firePropertyChange("Gesperrt", old, !old);
     }
 
 
@@ -311,4 +327,23 @@ public abstract class Konto implements Comparable<Konto>, Serializable {
         ausgabe += this.getGesperrtText() + System.getProperty("line.separator");
         return ausgabe;
     }
+
+    /**
+     * meldet Beobachter für das Konto an
+     * @param b neuer Beobachter
+     */
+    public void anmelden(PropertyChangeListener b) {
+        if (b != null) {
+            support.addPropertyChangeListener(b);
+        }
+    }
+
+    /**
+     * meldet Beobachter ab
+     * @param b abzumeldender Beobachter
+     */
+    public void abmelden(PropertyChangeListener b) {
+        support.removePropertyChangeListener(b);
+    }
+
 }

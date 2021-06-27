@@ -52,7 +52,9 @@ public class Girokonto extends Konto implements Ueberweisungsfaehig {
     public void setDispo(double dispo) {
         if (dispo < 0 || Double.isNaN(dispo))
             throw new IllegalArgumentException("Der Dispo ist nicht gültig!");
+        double old = this.dispo;
         this.dispo = dispo;
+        super.support.firePropertyChange("Dispo", old, dispo);
     }
 
     @Override
