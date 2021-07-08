@@ -3,6 +3,7 @@ package beleg11;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -11,7 +12,7 @@ import javax.swing.JLabel;
  * Stellt eine Digitale Uhr dar, die man anhalten und weiterlaufen lassen kann
  *
  */
-public class DigitalUhr extends JFrame 
+public class DigitalUhr extends JFrame implements View_Uhr
 {
 	private static final long serialVersionUID = 1L;
 	private static final String TITEL = "Digitaluhr";
@@ -23,9 +24,9 @@ public class DigitalUhr extends JFrame
 	private JLabel anzeige;
 	private JButton[] knoepfe; // Ein = Einschalten der Anzeige, 
 							  // Aus = Ausschalten der Anzeige, 
-	
+
 	private boolean uhrAn = true;
-	private Zeit z;
+	private Model_Zeit z;
 	
 	/**
 	 * erstellt das Fenster für die digitale Uhr und bringt es auf den
@@ -33,7 +34,7 @@ public class DigitalUhr extends JFrame
 	 */
 	public DigitalUhr() {
 		uhrAn = true;
-		z = new Zeit();
+		z = new Model_Zeit();
 
 		// Erstellung der Oberflächenelemente:
 		setTitle(TITEL);
@@ -54,7 +55,7 @@ public class DigitalUhr extends JFrame
 		ActionListener lauscher = new ActionListener() {
 			/**
 			 * schaltet je nach gedrückten Knopf die Uhrzeitanzeige ein (Ein), die Uhrzeitanzeige
-			 * aus (Aus) 
+			 * aus (Aus)
 			 */
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -78,21 +79,21 @@ public class DigitalUhr extends JFrame
 		}
 		
 		//Thread starten, um die Uhrzeit laufen zu lassen:
-		new Thread() {
-			/**
-			 * löst jede Sekunde die Aktualisierung der Anzeige aus
-			 */
-			@Override
-			public void run() {
-				try {
-					while (true) {
-						tick();
-						Thread.sleep(1000);
-					}
-				}
-				catch (InterruptedException e) {}
-			}
-		}.start();
+//		new Thread() {
+//			/**
+//			 * löst jede Sekunde die Aktualisierung der Anzeige aus
+//			 */
+//			@Override
+//			public void run() {
+//				try {
+//					while (true) {
+//						tick();
+//						Thread.sleep(1000);
+//					}
+//				}
+//				catch (InterruptedException e) {}
+//			}
+//		}.start();
 
 		// Auf den Bildschirm bringen:
 		pack();
@@ -106,8 +107,28 @@ public class DigitalUhr extends JFrame
 	{
 		if (uhrAn)
 		{
-			anzeige.setText(String.format("%02d:%02d:%02d", uhr.getStunde(), uhr.getMinute(),
-					uhr.getSekunde()));
+			anzeige.setText(String.format("%02d:%02d:%02d", z.getStunde(), z.getMinute(),
+					z.getSekunde()));
 		}
+	}
+
+
+	@Override
+	public void anAusSchalten(boolean b) {
+		knoepfe[0].setEnabled(!b);
+		knoepfe[1].setEnabled(b);
+		uhrAn = b;
+	}
+
+	@Override
+	public void anmelden(Controller_Uhr controller) {
+		this.z = controller.get_m_Zeit();
+		knoepfe[0].addActionListener(e -> controller.anschalten());
+		knoepfe[1].addActionListener(e -> controller.abschalten());
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		tick();
 	}
 }

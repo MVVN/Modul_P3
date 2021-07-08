@@ -2,20 +2,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * Interface für Beobachter, welche ein Subjekt beobachten
+ * Beobachter, welcher ein Subjekt beobachtet
  */
-public class Beobachter implements PropertyChangeListener {
+public interface Beobachter extends PropertyChangeListener {
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        Konto konto = (Konto) evt.getSource();
-        Object oldValue = evt.getOldValue();
-        Object newValue = evt.getNewValue();
-
-        System.out.println("Änderungen im Konto " + konto.getKontonummer() + " : " +
-                System.lineSeparator() +
-                evt.getPropertyName() + ":" + System.lineSeparator() +
-                oldValue + " --> " + newValue
-        );
-    }
+    /**
+     * erhält Werte durch PropertyChangeSupport
+     * @param evt event des PropertyChange
+     */
+    public void propertyChange(PropertyChangeEvent evt);
 }

@@ -1,3 +1,4 @@
+import java.beans.PropertyChangeEvent;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,7 +14,9 @@ import java.util.Locale;
  * @author Dorothea Hubrich
  * @version 1.0
  */
-public class Kunde implements Comparable<Kunde>, Serializable {
+public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
+
+
 
     /**
      * Klasse f�r Aufr�umarbeiten
@@ -217,5 +220,18 @@ public class Kunde implements Comparable<Kunde>, Serializable {
 
     public boolean equals(Kunde k) {
         return (this.getName() == k.getName());
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        Konto konto = (Konto) evt.getSource();
+        Object oldValue = evt.getOldValue();
+        Object newValue = evt.getNewValue();
+
+        System.out.println("Änderungen im Konto " + konto.getKontonummer() + " : " +
+                System.lineSeparator() +
+                evt.getPropertyName() + ":" + System.lineSeparator() +
+                oldValue + " --> " + newValue + System.lineSeparator()
+        );
     }
 }

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
 import javax.swing.JFrame;
 
 /**
@@ -12,7 +13,7 @@ import javax.swing.JFrame;
  * @author Doro
  *
  */
-public class KreisUhr extends JFrame 
+public class KreisUhr extends JFrame implements View_Uhr
 {
 	private static final long serialVersionUID = 1L;
 	private static final String TITEL = "Kreisuhr";
@@ -35,7 +36,7 @@ public class KreisUhr extends JFrame
 	private static final double ZWEI_PI = 2 * Math.PI;
 	private static final double[] KONST = new double[] { ZWEI_PI / 12, ZWEI_PI / 60, ZWEI_PI / 60 };
 
-	private Zeit uhrzeit;
+	private Model_Zeit z;
 	private boolean uhrAn;
 
 	/**
@@ -43,7 +44,7 @@ public class KreisUhr extends JFrame
 	 */
 	public KreisUhr() {
 		uhrAn = true;
-		uhrzeit = new Zeit();
+		z = new Model_Zeit();
 
 		tick(); // uhrzeit wird initialisiert
 
@@ -74,21 +75,21 @@ public class KreisUhr extends JFrame
 		});
 
 		//Thread starten, um die Uhrzeit laufen zu lassen:
-		new Thread() {
-			/**
-			 * löst jede Sekunde die Aktualisierung der Anzeige aus
-			 */
-			@Override
-			public void run() {
-				try {
-					while (true) {
-						Thread.sleep(1000);
-						tick();
-					}
-				}
-				catch (InterruptedException e) {}
-			}
-		}.start();
+//		new Thread() {
+//			/**
+//			 * löst jede Sekunde die Aktualisierung der Anzeige aus
+//			 */
+//			@Override
+//			public void run() {
+//				try {
+//					while (true) {
+//						Thread.sleep(1000);
+//						tick();
+//					}
+//				}
+//				catch (InterruptedException e) {}
+//			}
+//		}.start();
 	}
 
 	/**
@@ -114,7 +115,7 @@ public class KreisUhr extends JFrame
 		g.fillRect(0, 0, BREITE, HOEHE);
 		g.setColor(KREIS_FARBE);
 		g.drawOval((BREITE - DURCHMESSER) / 2, (HOEHE - DURCHMESSER) / 2, DURCHMESSER, DURCHMESSER); // Kreis
-		final int[] zeit = new int[] { uhrzeit.getStunde(), uhrzeit.getMinute(), uhrzeit.getSekunde() };
+		final int[] zeit = new int[] { z.getStunde(), z.getMinute(), z.getSekunde() };
 		g.drawString(INFO , POS_INFO_X, POS_INFO_Y);
 		g.drawString(String.format("%02d:%02d:%02d", zeit[0], zeit[1], zeit[2]), POS_INFO_X, POS_UHRZEIT); // Uhrzeit digital
 		for (int i = 0; i < END_X.length; i++) { // für jeden Zeiger
@@ -127,5 +128,21 @@ public class KreisUhr extends JFrame
 			g.setColor(ZEIGERFARBE[i]);
 			g.drawLine(ZENTRUM_X, ZENTRUM_Y, END_X[i][zeit[i]], END_Y[i][zeit[i]]);
 		}
+	}
+
+	@Override
+	public void anAusSchalten(boolean b) {
+		uhrAn = b;
+	}
+
+	@Override
+	public void anmelden(Controller_Uhr controller) {
+		this.z = controller.get_m_Zeit();
+
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		tick();
 	}
 }

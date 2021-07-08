@@ -22,8 +22,9 @@ public class Starter extends JFrame {
 	
 	/**
 	 * erzeugt die Oberfläche und bringt sie auf den Bildschirm
+	 * @param model_zeit das Zeit-Model
 	 */
-	public Starter()
+	public Starter(Model_Zeit model_zeit)
 	{
 		setTitle("Uhren-Anzeiger");
 		setSize(400, 100);
@@ -32,13 +33,21 @@ public class Starter extends JFrame {
 		// der Button btnKreis erzeugt eine KreisUhr
 		btnKreis = new JButton("Kreis");
 		btnKreis.addActionListener(
-				e -> kUhren.add(new KreisUhr()));
+				e -> {
+					KreisUhr kreisUhr = new KreisUhr();
+					new Controller_Uhr(kreisUhr, model_zeit);
+					kUhren.add(kreisUhr);
+				});
 		add(btnKreis);
 		
 		//der Button btnDigital erzeugt eine DigitalUhr
 		btnDigital = new JButton("Digital");
 		btnDigital.addActionListener(
-				e -> dUhren.add(new DigitalUhr()));
+				e -> {
+					DigitalUhr digitalUhr = new DigitalUhr();
+					new Controller_Uhr(digitalUhr, model_zeit);
+					dUhren.add(digitalUhr);
+				});
 		add(btnDigital); 
 		
 		// der Button btnHalt löscht alle Uhranzeige-Fenster vom
@@ -57,7 +66,6 @@ public class Starter extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new Starter();
+		new Starter(new Model_Zeit());
 	}
-
 }

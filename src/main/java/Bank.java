@@ -61,6 +61,7 @@ public class Bank implements Cloneable, Serializable {
         Konto konto = fabrik.kontoErstellen(inhaber, nextKontoNummer);
         kontoMap.put(konto.getKontonummer(), konto);
         nextKontoNummer++;
+        konto.anmelden(inhaber);
         return konto.getKontonummer();
     }
 
