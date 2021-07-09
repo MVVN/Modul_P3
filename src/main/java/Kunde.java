@@ -1,3 +1,6 @@
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import java.beans.PropertyChangeEvent;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -16,15 +19,12 @@ import java.util.Locale;
  */
 public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
 
-
-
     /**
      * Klasse f�r Aufr�umarbeiten
-     * @author Doro
      *
+     * @author Doro
      */
-    private class Zerstoerer implements Runnable
-    {
+    private class Zerstoerer implements Runnable {
         @Override
         public void run() {
             System.out.println("Kunde zerst�rt");
@@ -44,6 +44,7 @@ public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
 
     /**
      * liefert die systemspezifische Anrede
+     *
      * @return systemspezifische Anrede
      */
     public static String getANREDE() {
@@ -61,11 +62,16 @@ public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
     /**
      * Die Adresse
      */
-    private String adresse;
+//    private String adresse;
     /**
      * Geburtstag
      */
     private LocalDate geburtstag;
+
+    /**
+     * AdressenProperty
+     */
+    private StringProperty adresse;
 
     /**
      * erzeugt einen Standardkunden
@@ -77,19 +83,20 @@ public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
     /**
      * Erzeugt einen Kunden mit den übergebenen Werten
      *
-     * @param vorname Vorname
+     * @param vorname  Vorname
      * @param nachname Nachname
-     * @param adresse Adresse
-     * @param gebdat Geburtstag
+     * @param adresse  Adresse
+     * @param gebdat   Geburtstag
      * @throws IllegalArgumentException wenn einer der Parameter null ist
      */
     public Kunde(String vorname, String nachname, String adresse, LocalDate gebdat) {
-        if(vorname == null || nachname == null || adresse == null || gebdat == null)
+        if (vorname == null || nachname == null || adresse == null || gebdat == null)
             throw new IllegalArgumentException("null als Parameter nich erlaubt");
         this.vorname = vorname;
         this.nachname = nachname;
-        this.adresse = adresse;
+//        this.adresse = adresse;
         this.geburtstag = gebdat;
+        this.adresse = new SimpleStringProperty(adresse);
 
         Zerstoerer z = new Zerstoerer();
         Thread t = new Thread(z);
@@ -100,15 +107,15 @@ public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
     /**
      * Erzeugt einen Kunden mit den übergebenen Werten
      *
-     * @param vorname Vorname
+     * @param vorname  Vorname
      * @param nachname Nachname
-     * @param adresse Adresse
-     * @param gebdat Geburtstag im Format tt.mm.yy
-     * @throws DateTimeParseException wenn das Format des �bergebenen Datums nicht korrekt ist
+     * @param adresse  Adresse
+     * @param gebdat   Geburtstag im Format tt.mm.yy
+     * @throws DateTimeParseException   wenn das Format des �bergebenen Datums nicht korrekt ist
      * @throws IllegalArgumentException wenn einer der Parameter null ist
      */
-    public Kunde(String vorname, String nachname, String adresse, String gebdat)  {
-        this(vorname, nachname, adresse, LocalDate.parse(gebdat,DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
+    public Kunde(String vorname, String nachname, String adresse, String gebdat) {
+        this(vorname, nachname, adresse, LocalDate.parse(gebdat, DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)));
     }
 
     /**
@@ -139,7 +146,7 @@ public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
      * @return Adresse des Kunden
      */
     public String getAdresse() {
-        return adresse;
+        return adresse.get();
     }
 
     /**
@@ -149,9 +156,17 @@ public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
      * @throws IllegalArgumentException wenn adresse null ist
      */
     public void setAdresse(String adresse) {
-        if(adresse == null)
+        if (adresse == null)
             throw new IllegalArgumentException("Adresse darf nicht null sein");
-        this.adresse = adresse;
+//        this.adresse = adresse;
+        this.adresse.set(adresse);
+    }
+
+    /**
+     * @return Adresse als StringProperty
+     */
+    public StringProperty adresseProperty() {
+        return this.adresse;
     }
 
     /**
@@ -170,7 +185,7 @@ public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
      * @throws IllegalArgumentException wenn nachname null ist
      */
     public void setNachname(String nachname) {
-        if(nachname == null)
+        if (nachname == null)
             throw new IllegalArgumentException("Nachname darf nicht null sein");
         this.nachname = nachname;
     }
@@ -191,7 +206,7 @@ public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
      * @throws IllegalArgumentException wenn vorname null ist
      */
     public void setVorname(String vorname) {
-        if(vorname == null)
+        if (vorname == null)
             throw new IllegalArgumentException("Vorname darf nicht null sein");
         this.vorname = vorname;
     }
@@ -212,7 +227,7 @@ public class Kunde implements Comparable<Kunde>, Serializable, Beobachter {
 
     static   //statischer Block/Initialisierer
     {
-        if(Locale.getDefault().getCountry().equals("DE"))
+        if (Locale.getDefault().getCountry().equals("DE"))
             ANREDE = "Hallo Benutzer!";
         else
             ANREDE = "Dear Customer!";
